@@ -1,9 +1,13 @@
 <?php require 'koneksi.php';
+$profil = mysqli_fetch_assoc(
+    mysqli_query($conn,
+    "SELECT * FROM profil WHERE id = 1")
+);
 
 if (!isset($_SESSION['admin'])) header("Location: login.php");
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
-    header("Location: berita.php");
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -16,7 +20,7 @@ $result = mysqli_stmt_get_result($stmt);
 $data = mysqli_fetch_assoc($result);
 
 if (!$data) {
-    header("Location: berita.php");
+    header("Location: dashboard.php");
     exit;
 }
 
@@ -35,7 +39,7 @@ if (isset($_POST['update'])) {
         mysqli_stmt_bind_param($stmt, "ssi", $j, $i, $id);
     }
     mysqli_stmt_execute($stmt);
-    header("Location: berita.php");
+    header("Location: dashboard.php");
 } ?>
 
 <!DOCTYPE html>
@@ -50,7 +54,7 @@ if (isset($_POST['update'])) {
 </head>
 <body>
     <div class="grid-container">
-        <nav><a href="berita.php">&larr;Kembali</a></nav>
+        <nav><a href="dashboard.php">&larr;Kembali</a></nav>
         <main class="full-width">
             <h2>Edit Berita</h2>
             <form method="POST" enctype="multipart/form-data">

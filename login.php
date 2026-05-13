@@ -1,20 +1,45 @@
-<?php require 'koneksi.php';
+<?php
+require 'koneksi.php';
+
 if (isset($_POST['login'])) {
+
     $username = $_POST['username'];
     $password = $_POST['password'];
-    $stmt = mysqli_prepare($conn, "SELECT * FROM admin WHERE username = ? AND password = ?");
-    mysqli_stmt_bind_param($stmt, "ss", $username, $password);
+
+    $stmt = mysqli_prepare($conn,
+        "SELECT * FROM admin WHERE username = ?"
+    );
+
+    mysqli_stmt_bind_param($stmt, "s", $username);
+
     mysqli_stmt_execute($stmt);
+
     $result = mysqli_stmt_get_result($stmt);
-    if (mysqli_num_rows($result) > 0) {
-        session_start();
-        $_SESSION['admin'] = $username;
-        header("Location: berita.php");
-        exit();
+
+    $data = mysqli_fetch_assoc($result);
+
+    if ($data) {
+
+        if (password_verify($password, $data['password'])) {
+
+            $_SESSION['admin'] = $username;
+
+            header("Location: dashboard.php");
+            exit();
+
+        } else {
+
+            echo "<script>alert('Periksa Username atau Password!');</script>";
+
+        }
+
     } else {
-        echo "<script>alert('Periksa username dan password Anda!!');</script>";
+
+        echo "<script>alert('Periksa Username atau Password!');</script>";
+
     }
-} ?>
+}
+?>
 
 <!DOCTYPE html>
 <html lang="en">

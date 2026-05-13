@@ -1,5 +1,5 @@
 <?php require 'koneksi.php';
-$profil = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM profil WHERE id_profil = 1"));
+$profil = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM profil WHERE id = 1"));
 $id = $_GET['id'];
 $stmt = mysqli_prepare($conn, "SELECT * FROM berita WHERE id = ?");
 mysqli_stmt_bind_param($stmt, "i", $id);
