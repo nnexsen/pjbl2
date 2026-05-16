@@ -81,16 +81,16 @@ $query = mysqli_query(
                 <?php endif; ?>
 
                 <h3>
-                    <?= $b['judul']; ?>
+                    <?= htmlspecialchars($b['judul'], ENT_QUOTES, 'UTF-8'); ?>
                 </h3>
 
                 <p>
 
-                    <?= substr(
+                    <?= htmlspecialchars(substr(
                         strip_tags($b['isi']),
                         0,
                         120
-                    ); ?>...
+                    ), ENT_QUOTES, 'UTF-8'); ?>...
 
                 </p>
 

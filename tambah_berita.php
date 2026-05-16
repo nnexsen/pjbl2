@@ -1,5 +1,8 @@
 <?php require 'koneksi.php';
-if (!isset($_SESSION['admin'])) header("Location: login.php");
+if (!isset($_SESSION['admin'])) {
+    header("Location: login.php");
+    exit;
+}
 $profil = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM profil WHERE id=1")); 
 if (isset($_POST['submit'])) {
     $j = $_POST['judul'];

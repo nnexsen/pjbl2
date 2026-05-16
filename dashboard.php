@@ -15,7 +15,7 @@ $profil = mysqli_fetch_assoc(
 // =========================
 if (isset($_GET['hapus_berita'])) {
 
-    $id = $_GET['hapus_berita'];
+    $id = (int) $_GET['hapus_berita'];
 
     $stmt = mysqli_prepare(
         $conn,
@@ -30,9 +30,13 @@ if (isset($_GET['hapus_berita'])) {
         mysqli_stmt_get_result($stmt)
     );
 
-    if ($data['gambar']) {
+    if (!empty($data['gambar'])) {
 
-        unlink("assets/uploads/" . $data['gambar']);
+        $path = "assets/uploads/" . $data['gambar'];
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
     }
 
     $stmt = mysqli_prepare(
@@ -53,7 +57,7 @@ if (isset($_GET['hapus_berita'])) {
 // =========================
 if (isset($_GET['hapus_galeri'])) {
 
-    $id = $_GET['hapus_galeri'];
+    $id = (int) $_GET['hapus_galeri'];
 
     $stmt = mysqli_prepare(
         $conn,
@@ -68,11 +72,13 @@ if (isset($_GET['hapus_galeri'])) {
         mysqli_stmt_get_result($stmt)
     );
 
-    if ($data['gambar']) {
+    if (!empty($data['gambar'])) {
 
-        unlink(
-            "assets/uploads/galeri/" . $data['gambar']
-        );
+        $path = "assets/uploads/galeri/" . $data['gambar'];
+
+        if (file_exists($path)) {
+            unlink($path);
+        }
     }
 
     $stmt = mysqli_prepare(
@@ -100,7 +106,19 @@ if (isset($_POST['submit_berita'])) {
 
     if ($gambar != "") {
 
-        $img = time() . "_" . $gambar;
+        $tmp = $_FILES['gambar_berita']['tmp_name'];
+
+        $mime = mime_content_type($tmp);
+
+        $allowedMime = [
+            'image/jpeg',
+            'image/png'
+        ];
+
+        if (!in_array($mime, $allowedMime)) {
+            die("File tidak valid");
+        }
+
         $ext = strtolower(
     pathinfo($gambar, PATHINFO_EXTENSION)
 );
@@ -113,10 +131,20 @@ if (!in_array($ext, $allowed)) {
 
 }
 
-        move_uploaded_file(
-            $_FILES['gambar_berita']['tmp_name'],
-            "assets/uploads/" . $img
-        );
+        $uploadDir = "assets/uploads/";
+
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $img = time() . "." . $ext;
+
+        if (!move_uploaded_file(
+            $tmp,
+            $uploadDir . $img
+        )) {
+            die("Upload gagal");
+        }
 
         $stmt = mysqli_prepare(
             $conn,
@@ -166,7 +194,17 @@ if (isset($_POST['submit_galeri'])) {
 
     $tmp = $_FILES['gambar_galeri']['tmp_name'];
 
-    $namaBaru = time() . "_" . $gambar;
+    $mime = mime_content_type($tmp);
+
+    $allowedMime = [
+        'image/jpeg',
+        'image/png'
+    ];
+
+    if (!in_array($mime, $allowedMime)) {
+        die("File tidak valid");
+    }
+
     $ext = strtolower(
     pathinfo($gambar, PATHINFO_EXTENSION)
 );
@@ -179,10 +217,20 @@ if (!in_array($ext, $allowed)) {
 
 }
 
-    move_uploaded_file(
+    $uploadDir = "assets/uploads/galeri/";
+
+    if (!is_dir($uploadDir)) {
+        mkdir($uploadDir, 0755, true);
+    }
+
+    $namaBaru = time() . "." . $ext;
+
+    if (!move_uploaded_file(
         $tmp,
-        "assets/uploads/galeri/" . $namaBaru
-    );
+        $uploadDir . $namaBaru
+    )) {
+        die("Upload gagal");
+    }
 
     $stmt = mysqli_prepare(
         $conn,
@@ -233,6 +281,19 @@ if (isset($_POST['update'])) {
     // =========================
     if ($logo != "") {
 
+        $tmp = $_FILES['logo']['tmp_name'];
+
+        $mime = mime_content_type($tmp);
+
+        $allowedMime = [
+            'image/jpeg',
+            'image/png'
+        ];
+
+        if (!in_array($mime, $allowedMime)) {
+            die("File tidak valid");
+        }
+
         $ext = strtolower(
             pathinfo($logo, PATHINFO_EXTENSION)
         );
@@ -245,17 +306,29 @@ if (isset($_POST['update'])) {
 
         }
 
-        $n_logo = time() . "_" . $logo;
+        $uploadDir = "assets/img/";
 
-        move_uploaded_file(
-            $_FILES['logo']['tmp_name'],
-            "assets/img/" . $n_logo
-        );
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $n_logo = time() . "." . $ext;
+
+        if (!move_uploaded_file(
+            $tmp,
+            $uploadDir . $n_logo
+        )) {
+            die("Upload gagal");
+        }
 
         // hapus logo lama
         if ($profil['logo']) {
 
-            unlink("assets/img/" . $profil['logo']);
+            $path = "assets/img/" . $profil['logo'];
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
 
         }
 
@@ -441,7 +514,7 @@ if (isset($_POST['update'])) {
 
                     <td><?= $no++; ?></td>
 
-                    <td><?= $b['judul']; ?></td>
+                    <td><?= htmlspecialchars($b['judul']); ?></td>
 
                     <td>
 
@@ -557,12 +630,12 @@ if (isset($_POST['update'])) {
                     <td>
 
                         <img
-                        src="assets/uploads/galeri/<?= $g['gambar']; ?>"
+                        src="assets/uploads/galeri/<?= htmlspecialchars($g['gambar']); ?>"
                         width="100">
 
                     </td>
 
-                    <td><?= $g['judul']; ?></td>
+                    <td><?= htmlspecialchars($g['judul']); ?></td>
 
                     <td>
 
@@ -610,7 +683,7 @@ enctype="multipart/form-data">
         <input
         type="text"
         name="nama"
-        value="<?= $profil['nama_sekolah'] ?>"
+        value="<?= htmlspecialchars($profil['nama_sekolah']) ?>"
         required>
 
     </div>
@@ -631,7 +704,7 @@ enctype="multipart/form-data">
 
         <textarea
         name="alamat"
-        rows="3"><?= $profil['alamat'] ?></textarea>
+    rows="3"><?= htmlspecialchars($profil['alamat']) ?></textarea>
 
     </div>
 
@@ -641,7 +714,7 @@ enctype="multipart/form-data">
 
         <textarea
         name="visi"
-        rows="3"><?= $profil['visi'] ?></textarea>
+    rows="3"><?= htmlspecialchars($profil['visi']) ?></textarea>
 
     </div>
 
@@ -651,7 +724,7 @@ enctype="multipart/form-data">
 
         <textarea
         name="misi"
-        rows="5"><?= $profil['misi'] ?></textarea>
+    rows="5"><?= htmlspecialchars($profil['misi']) ?></textarea>
 
     </div>
 
@@ -661,7 +734,7 @@ enctype="multipart/form-data">
 
         <textarea
         name="sejarah"
-        rows="6"><?= $profil['sejarah'] ?></textarea>
+    rows="6"><?= htmlspecialchars($profil['sejarah']) ?></textarea>
 
     </div>
 

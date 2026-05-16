@@ -58,8 +58,8 @@ if (isset($_POST['update'])) {
         <main class="full-width">
             <h2>Edit Berita</h2>
             <form method="POST" enctype="multipart/form-data">
-                <input type="text" name="judul" value="<?=$data['judul'] ?>">
-                <textarea name="isi" rows="10"><?=$data['isi'] ?></textarea>
+                <input type="text" name="judul" value="<?=htmlspecialchars($data['judul'], ENT_QUOTES, 'UTF-8') ?>">
+                <textarea name="isi" rows="10"><?=htmlspecialchars($data['isi'], ENT_QUOTES, 'UTF-8') ?></textarea>
                 <input type="file" name="gambar">
                 <button type="submit" name="update">Update</button>
             </form>

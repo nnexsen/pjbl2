@@ -15,21 +15,6 @@ $query = mysqli_query($conn,
 <body>
 
 <h1>Galeri Sekolah</h1>
-
-<div class="galeri-grid">
-
-<?php while($g = mysqli_fetch_assoc($query)) : ?>
-
-    <div class="card-galeri">
-
-        <img src="assets/uploads/galeri/<?= $g['gambar']; ?>" width="250">
-
-        <h3><?= $g['judul']; ?></h3>
-
-        <p><?= $g['deskripsi']; ?></p>
-
-    </div>
-
     <nav>
 
         <a href="index.php">
@@ -37,6 +22,22 @@ $query = mysqli_query($conn,
         </a>
 
     </nav>
+
+<div class="galeri-grid">
+
+<?php while($g = mysqli_fetch_assoc($query)) : ?>
+
+    <div class="card-galeri">
+
+        <img src="assets/uploads/galeri/<?= htmlspecialchars($g['gambar'], ENT_QUOTES, 'UTF-8'); ?>" width="250">
+
+        <h3><?= htmlspecialchars($g['judul'], ENT_QUOTES, 'UTF-8'); ?></h3>
+
+        <p><?= htmlspecialchars($g['deskripsi'], ENT_QUOTES, 'UTF-8'); ?></p>
+
+    </div>
+
+    
 
 <?php endwhile; ?>
 

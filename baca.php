@@ -29,9 +29,9 @@ $berita = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt)); ?>
             </div>
             <main class="full-width">
                 <article>
-                    <h1><?= $berita['judul'] ?></h1>
-                    <?php if ($berita['gambar']): ?><img src="assets/uploads/<?= $berita['gambar']; ?>"class='img-detail'><?php endif; ?>
-                    <p><?= nl2br($berita['isi']) ?></p>
+                    <h1><?= htmlspecialchars($berita['judul'], ENT_QUOTES, 'UTF-8') ?></h1>
+                    <?php if ($berita['gambar']): ?><img src="assets/uploads/<?= htmlspecialchars($berita['gambar'], ENT_QUOTES, 'UTF-8'); ?>"class='img-detail'><?php endif; ?>
+                    <p><?= nl2br(htmlspecialchars($berita['isi'], ENT_QUOTES, 'UTF-8')) ?></p>
                 </article>
             </main>
             <footer>

@@ -71,6 +71,10 @@ if(isset($_POST['login'])){
         </div>
         <main id="profil">
             <div class="profil-flex">
+                <aside class="profil-aside">
+                    <img src="assets/img/kepala.png" alt="Kepala Sekolah" style="width:100%;max-width:220px;">
+                    <p><strong>Drs. Nama Kepala</strong><br>Kepala Sekolah</p>
+                </aside>
                 <section>
                     <h3 id="visimisi">Visi & Misi</h3>
                     <p><strong>Visi:</strong> <?= $profil['visi'] ?></p>
@@ -79,10 +83,7 @@ if(isset($_POST['login'])){
                     <h3 id="sejarah">Sejarah</h3>
                     <p>Sekolah ini didirikan pada tahun 1990 dengan tujuan untuk memberikan pendidikan berkualitas kepada siswa-siswa di daerah ini. Sejak berdirinya, sekolah telah berkembang pesat dan menjadi salah satu institusi pendidikan terkemuka di wilayahnya.</p>
                 </section>
-                <aside class="profil-aside">
-                    <img src="assets/img/kepala.png" alt="Kepala Sekolah" style="width:100%;max-width:220px;">
-                    <p><strong>Drs. Nama Kepala</strong><br>Kepala Sekolah</p>
-                </aside>
+                
             </div>
         </main>
         <section class="berita-section" id="berita">
@@ -91,8 +92,8 @@ if(isset($_POST['login'])){
                 <?php $q = mysqli_query($conn, "SELECT * FROM berita ORDER BY id DESC LIMIT 6");
                 while ($r = mysqli_fetch_assoc($q)): ?>
                 <div class="card-berita">
-                    <?php if ($r['gambar']): ?><img src="assets/uploads/<?= $r['gambar']; ?>" alt="Gambar Berita"><?php endif; ?>
-                    <h4><?= $r['judul'] ?></h4>
+                    <?php if ($r['gambar']): ?><img src="assets/uploads/<?= htmlspecialchars($r['gambar'], ENT_QUOTES, 'UTF-8'); ?>" alt="Gambar Berita"><?php endif; ?>
+                    <h4><?= htmlspecialchars($r['judul'], ENT_QUOTES, 'UTF-8'); ?></h4>
                     <a href="baca.php?id=<?= $r['id']; ?>" class="btn">Baca Selengkapnya</a>
                 </div>
                 <?php endwhile; ?>
