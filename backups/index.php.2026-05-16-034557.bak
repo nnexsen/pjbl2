@@ -1,29 +1,41 @@
 <?php
+
 session_start();
 require 'koneksi.php';
 $query = mysqli_query($conn, "SELECT * FROM profil WHERE id = 1");
+
 $profil = mysqli_fetch_assoc($query);
 
 if(isset($_POST['login'])){
-     $username = $_POST['username'];
-     $password = $_POST['password'];
 
-     $stmt = mysqli_prepare($conn, "SELECT * FROM admin WHERE username = ?");
-     mysqli_stmt_bind_param($stmt, "s", $username);
-     mysqli_stmt_execute($stmt);
-     $query = mysqli_stmt_get_result($stmt);
-     $data = mysqli_fetch_assoc($query);
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-     if($data){
-         if(password_verify($password, $data['password'])){
-             $_SESSION['admin'] = $username;
-             header("Location: index.php");
-         } else {
-             $login_error = "Password salah";
-         }
-     } else {
-         $login_error = "Username tidak ada";
-     }
+    $query = mysqli_query($conn,
+        "SELECT * FROM admin WHERE username='$username'"
+    );
+
+    $data = mysqli_fetch_assoc($query);
+
+    if($data){
+
+        if(password_verify($password, $data['password'])){
+
+            $_SESSION['login'] = true;
+
+            header("Location: index.php");
+
+        } else {
+
+            echo "Password salah";
+
+        }
+
+    } else {
+
+        echo "Username tidak ada";
+
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -37,7 +49,6 @@ if(isset($_POST['login'])){
 </head>
 <body>
     <?php require 'navbar.php'; ?>
-
     <!-- Hero Section -->
     <section class="hero-section">
         <h2>Selamat Datang di Portal Informasi</h2>
@@ -47,24 +58,20 @@ if(isset($_POST['login'])){
     <main>
         <!-- Profil Sekolah Section -->
         <section class="profil-section">
-            <div class="profil-flex">
                 <aside class="profil-aside">
-                    <img src="assets/img/kepala.png" alt="Kepala Sekolah">
-                    <p><strong>Kepala Sekolah</strong></p>
+                    <img src="assets/img/kepala.png" alt="Kepala Sekolah" style="width:100%;max-width:220px;">
+                    <p><strong>Drs. Nama Kepala</strong><br>Kepala Sekolah</p>
                 </aside>
                 <section>
-                    <h3>Visi & Misi Sekolah</h3>
-                    <h4 style="color: var(--primary-color); margin-top: 1rem;">Visi</h4>
-                    <p><?= htmlspecialchars($profil['visi'], ENT_QUOTES, 'UTF-8'); ?></p>
-                    
-                    <h4 style="color: var(--primary-color); margin-top: 1.5rem;">Misi</h4>
-                    <p><?= htmlspecialchars($profil['misi'], ENT_QUOTES, 'UTF-8'); ?></p>
-                    
-                    <hr style="border: none; border-top: 2px solid var(--border-light); margin: 2rem 0;">
-                    
-                    <h3>Sejarah Sekolah</h3>
+                    <h3 id="visimisi">Visi & Misi</h3>
+                    <p><strong>Visi:</strong> <?= $profil['visi'] ?></p>
+                    <p><strong>Misi:</strong> <?= $profil['misi'] ?></p>
+                    <hr>
+                    <h3 id="sejarah">Sejarah</h3>
                     <p>Sekolah ini didirikan pada tahun 1990 dengan tujuan untuk memberikan pendidikan berkualitas kepada siswa-siswa di daerah ini. Sejak berdirinya, sekolah telah berkembang pesat dan menjadi salah satu institusi pendidikan terkemuka di wilayahnya.</p>
                 </section>
+                
+            </div>
             </div>
         </section>
 
@@ -104,18 +111,6 @@ if(isset($_POST['login'])){
             <p style="color: var(--text-light); margin-top: -0.5rem;">Koleksi foto kegiatan dan fasilitas sekolah</p>
             
             <div class="galeri-grid">
-                <?php 
-                $g_query = mysqli_query($conn, "SELECT * FROM galeri ORDER BY id DESC LIMIT 6");
-                while ($g = mysqli_fetch_assoc($g_query)): 
-                ?>
-                <div class="card-galeri">
-                    <img src="assets/uploads/galeri/<?= htmlspecialchars($g['gambar'], ENT_QUOTES, 'UTF-8'); ?>" alt="Galeri">
-                    <div class="card-galeri-content">
-                        <h3><?= htmlspecialchars($g['judul'], ENT_QUOTES, 'UTF-8'); ?></h3>
-                        <p><?= htmlspecialchars($g['deskripsi'], ENT_QUOTES, 'UTF-8'); ?></p>
-                    </div>
-                </div>
-                <?php endwhile; ?>
             </div>
 
             <div style="text-align: center; margin-top: 2rem;">
@@ -125,7 +120,7 @@ if(isset($_POST['login'])){
     </main>
 
     <footer>
-        <p>&copy; <?= date('Y') ?> <?= htmlspecialchars($profil['nama_sekolah'], ENT_QUOTES, 'UTF-8'); ?>. @Nnext</p>
+        <p>&copy; <?= date('Y') ?> <?= htmlspecialchars($profil['nama_sekolah'], ENT_QUOTES, 'UTF-8'); ?>. Semua hak dilindungi. | Portal Informasi Sekolah</p>
     </footer>
 
 </body>

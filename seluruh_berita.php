@@ -1,5 +1,7 @@
 <?php
+session_start();
 require 'koneksi.php';
+
 
 $profil = mysqli_fetch_assoc(
     mysqli_query($conn,
@@ -14,115 +16,56 @@ $query = mysqli_query(
 
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0">
-
-    <title>Semua Berita</title>
-
-    <link
-    rel="stylesheet"
-    href="assets/css/style.css">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semua Berita - <?= htmlspecialchars($profil['nama_sekolah'], ENT_QUOTES, 'UTF-8'); ?></title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
-
 <body>
+    <?php require 'navbar.php'; ?>
 
-<div class="grid-container">
+    <!-- Banner -->
+    <div class="banner">
+        <h2>Semua Berita Sekolah</h2>
+    </div>
 
-    <header>
-
-        <img
-        src="assets/img/<?= $profil['logo']; ?>">
-
-        <div class="identitas">
-
-            <h1>
-                <?= $profil['nama_sekolah']; ?>
-            </h1>
-
-            <p>
-                <?= $profil['alamat']; ?>
-            </p>
-
-        </div>
-
-    </header>
-
-    <nav>
-
-        <a href="index.php">
-            &larr; Kembali Ke Beranda
-        </a>
-
-    </nav>
-
-    <main class="full-width">
-
-        <h2>Seluruh Berita Sekolah</h2>
-
-        <div class="berita-grid">
-
-        <?php while($b = mysqli_fetch_assoc($query)) : ?>
-
-            <div class="card-berita">
-
-                <?php if($b['gambar']) : ?>
-
-                    <img
-                    src="assets/uploads/<?= $b['gambar']; ?>"
-                    alt="gambar berita">
-
-                <?php endif; ?>
-
-                <h3>
-                    <?= htmlspecialchars($b['judul'], ENT_QUOTES, 'UTF-8'); ?>
-                </h3>
-
-                <p>
-
-                    <?= htmlspecialchars(substr(
-                        strip_tags($b['isi']),
-                        0,
-                        120
-                    ), ENT_QUOTES, 'UTF-8'); ?>...
-
-                </p>
-
-                <a
-                href="baca.php?id=<?= $b['id']; ?>"
-                class="btn">
-
-                    Baca Selengkapnya
-
-                </a>
-
+    <main>
+        <section class="berita-section">
+            <p style="color: var(--text-light); margin-bottom: 2rem;">Baca semua artikel dan informasi terbaru dari sekolah kami</p>
+            
+            <div class="berita-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <?php 
+                $count = 0;
+                while($b = mysqli_fetch_assoc($query)): 
+                    $count++;
+                ?>
+                <div class="card-berita">
+                    <?php if($b['gambar']) : ?>
+                        <img src="assets/uploads/<?= htmlspecialchars($b['gambar'], ENT_QUOTES, 'UTF-8'); ?>" alt="Gambar Berita">
+                    <?php else: ?>
+                        <div style="width: 100%; height: 200px; background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem;">📰</div>
+                    <?php endif; ?>
+                    <div class="card-berita-content">
+                        <h4><?= htmlspecialchars($b['judul'], ENT_QUOTES, 'UTF-8'); ?></h4>
+                        <p><?= htmlspecialchars(substr(strip_tags($b['isi']), 0, 120), ENT_QUOTES, 'UTF-8'); ?>...</p>
+                        <a href="baca.php?id=<?= $b['id']; ?>" class="btn">Baca Selengkapnya →</a>
+                    </div>
+                </div>
+                <?php endwhile; ?>
             </div>
 
-        <?php endwhile; ?>
-
-        </div>
-
+            <?php if ($count == 0): ?>
+            <div class="alert alert-info" style="text-align: center; margin-top: 2rem;">
+                <p>Belum ada berita yang dipublikasikan.</p>
+            </div>
+            <?php endif; ?>
+        </section>
     </main>
 
     <footer>
-
-        <p>
-
-            &copy; <?= date('Y'); ?>
-
-            <?= $profil['nama_sekolah']; ?>
-
-        </p>
-
+        <p>&copy; <?= date('Y') ?> <?= htmlspecialchars($profil['nama_sekolah'], ENT_QUOTES, 'UTF-8'); ?>. @Nnext</p>
     </footer>
-
-</div>
 
 </body>
 </html>
